@@ -1,22 +1,39 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { Hotel } from "../../hotel/entities/hotel.entity";
 import { Service } from "../../service/entities/service.entity";
 
-@Entity('hotel_service')
-export class HotelService {
+@Table({tableName: 'hotel_service', timestamps: false})
+export class HotelService extends Model<HotelService> {
     @ApiProperty({example: '1', description: 'Unikal id'})
-    @PrimaryGeneratedColumn()
+    @Column({
+        type: DataType.INTEGER,
+        unique: true,
+        autoIncrement: true,
+        primaryKey: true
+    })
     id: number
 
     @ApiProperty({example: '1', description: 'Unikal id'})
+    @ForeignKey(() => Hotel)
     @Column({
-        nullable: false
+        type: DataType.INTEGER,
+        allowNull: false
     })
     hotel_id: number
 
     @ApiProperty({example: '1', description: 'Unikal id'})
-    @Column({nullable: false})
+    @ForeignKey(() => Service)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false
+    })
     service_id: number
+
+    @BelongsTo(() => Hotel)
+    hotel: Hotel
+
+    @BelongsTo(() => Service)
+    service: Service
 
 }

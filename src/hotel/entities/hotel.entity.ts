@@ -1,76 +1,79 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { Category } from "../../category/entities/category.entity";
 import { Comment } from "../../comment/entities/comment.entity";
 import { Photo } from "../../photos/entities/photo.entity";
 import { Place } from "../../place/entities/place.entity";
 
-@Entity('hotel')
-export class Hotel {
+@Table({tableName: 'hotel', timestamps: false})
+export class Hotel extends Model<Hotel> {
     @ApiProperty({example: "1", description: "Unikal id"})
-    @PrimaryGeneratedColumn()
-    id: number;
+    @Column({
+        type: DataType.INTEGER,
+        unique: true,
+        autoIncrement: true,
+        primaryKey: true
+    })
+    id: number
 
     @ApiProperty({example: 'ShoxSaroy', description: "Mexmonxona nomi"})
     @Column({
-        nullable: false,
-        unique: true
+        type: DataType.STRING,
+        allowNull: false
     })
     name: string
 
     @ApiProperty({example: 'Toshkent sh. Chilonzor', description: "Mexmonxona addressi"})
     @Column({
-        nullable: false,
+        type: DataType.STRING,
+        allowNull: false
     })
     address: string
 
     @ApiProperty({example: 'Toshkent sh. Chilonzor', description: "Mexmonxona locatsiyasi"})
     @Column({
-        nullable: false,
+        type: DataType.STRING,
+        allowNull: false
     })
     location: string
 
     @ApiProperty({example: 'Mexmonxona haqida malumotlar', description: "Mexmonxona haqida malumotlar"})
     @Column({
-        nullable: false,
+        type: DataType.STRING,
+        allowNull: false
     })
     description: string
 
     @ApiProperty({example: 'Toshkent sh. Chilonzor', description: "Mexmonxona addressi"})
-    
+    @ForeignKey(() => Comment)
     @Column({
-        nullable: false,
-        
-    })
-    photo_id: number
-
-    @ApiProperty({example: 'Toshkent sh. Chilonzor', description: "Mexmonxona addressi"})
-    @Column({
-        nullable: false,
+        type: DataType.INTEGER,
     })
     comment_id: number
 
     @ApiProperty({example: 'Toshkent sh. Chilonzor', description: "Mexmonxona addressi"})
+    @ForeignKey(() => Place)
     @Column({
-        nullable: false,
+        type: DataType.INTEGER,
+        allowNull: false
     })
     place_id: number
 
     @ApiProperty({example: 'Toshkent sh. Chilonzor', description: "Mexmonxona addressi"})
+    @ForeignKey(() => Category)
     @Column({
-        nullable: false,
+        type: DataType.INTEGER,
+        allowNull: false
     })
     category_id: number
 
-    @OneToMany(type => Photo, photo => photo.hotel)
-    photos: Photo[]
+    @BelongsTo(() => Comment)
+    comments: Comment
 
-    @OneToMany(type => Comment, comment => comment.id)
-    comments: Comment[]
+    @BelongsTo(() => Place)
+    places: Place
 
-    @OneToMany(type => Place, place => place.id)
-    place: Place[]
-
-    @OneToOne(type => Category)
+    @BelongsTo(() => Category)
     category: Category
+
 }

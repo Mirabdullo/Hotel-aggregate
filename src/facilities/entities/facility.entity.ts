@@ -1,15 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
-@Entity('facility')
-export class Facility {
+@Table({tableName: 'facility', timestamps: false})
+export class Facility extends Model<Facility> {
     @ApiProperty({example: '1', description: "Unikal ID"})
-    @PrimaryGeneratedColumn()
-    id: number;
+    @Column({
+        type: DataType.INTEGER,
+        unique: true,
+        autoIncrement: true,
+        primaryKey: true
+    })
+    id: number
 
     @ApiProperty({example: 'divat', description: "Xona jihozlari"})
     @Column({
-        nullable: false,
+        type: DataType.STRING,
+        allowNull: false,
         unique: true
     })
     name: string

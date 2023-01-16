@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CommentController } from './comment.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { Comment } from './entities/comment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment])],
+  imports: [SequelizeModule.forFeature([Comment])],
   controllers: [CommentController],
-  providers: [CommentService]
+  providers: [CommentService],
 })
 export class CommentModule {}

@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { GuestService } from './guest.service';
 import { GuestController } from './guest.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { Guest } from './entities/guest.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Guest])],
+  imports: [SequelizeModule.forFeature([Guest]), JwtModule],
   controllers: [GuestController],
   providers: [GuestService],
 })

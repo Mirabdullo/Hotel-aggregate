@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, Max, Min } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Max, Min } from "class-validator";
 
 export class CreateGuestDto {
     @ApiProperty({example: 'Akmal', description: 'Mexmonning  ismi'})
@@ -25,11 +25,9 @@ export class CreateGuestDto {
     @IsEmail({},{message: "Email to'g'ri kelmadi"})
     email: string;
 
-    @ApiProperty({example: '1', description: 'Mexmonning  jinsi'})
-    @IsNotEmpty()
-    @IsNumber({},{message: "gender must be number"})
-    @Min(1)
-    @Max(2)
-    gender: number;
+    @ApiProperty({example: 'Fayziyev', description: 'Mexmonning  ismi'})
+    @IsOptional()
+    @IsBoolean({message: "Owner true yoki false"})
+    is_owner: boolean;
   
 }

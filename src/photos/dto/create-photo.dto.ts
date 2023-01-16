@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator";
 import { IsNull } from "typeorm";
 
 export class CreatePhotoDto {
@@ -9,12 +9,12 @@ export class CreatePhotoDto {
     table_name: string
 
     @ApiProperty({example: 'photo.jpeg', description: "Photo"})
-    @IsNotEmpty()
+    @IsOptional()
     @IsString({message: "Photo must be string"})
     photo: string
 
     @ApiProperty({example: '1', description: "unikal id"})
     @IsNotEmpty()
-    @IsNumber({},{message: "id must be number"})
-    hotel_or_place_id: number
+    @IsNumberString({},{message: "id must be number"})
+    hotel_or_place_id: string
 }

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
 import { HotelModule } from './hotel/hotel.module';
@@ -10,36 +10,32 @@ import { PlaceModule } from './place/place.module';
 import { PlaceCategoryModule } from './place_category/place_category.module';
 import { FacilitiesModule } from './facilities/facilities.module';
 import { FacilitiesPlaceModule } from './facilities_place/facilities_place.module';
-import { RoomModule } from './room/room.module';
 import { ServiceModule } from './service/service.module';
 import { HotelServiceModule } from './hotel_service/hotel_service.module';
 import { CategoryModule } from './category/category.module';
 import { PhotosModule } from './photos/photos.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './admin/admin.module';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { OwnerModule } from './owner/owner.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: './.env' }),
+    ConfigModule.forRoot({
+      envFilePath: `.${process.env.NODE_ENV}.env`,
+    }),
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, 'static'),
     }),
-
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('POSTGRES_HOST'),
-        port: config.get<number>('POSTGRES_PORT'),
-        username: config.get<string>('POSTGRES_USER'),
-        password: config.get<string>('POSTGRES_PASSWORD'),
-        database: config.get<string>('POSTGRES_DB'),
-        entities: [__dirname + 'dist/**/*.entity{.ts,.js}'],
-        synchronize: true,
-        autoLoadEntities: true,
-        logging: true,
-      }),
+    SequelizeModule.forRoot({
+      dialect: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+      models: [],
+      autoLoadModels: true,
+      logging: false,
     }),
 
     HotelModule,
@@ -58,8 +54,6 @@ import { AdminModule } from './admin/admin.module';
 
     FacilitiesPlaceModule,
 
-    RoomModule,
-
     ServiceModule,
 
     HotelServiceModule,
@@ -69,6 +63,8 @@ import { AdminModule } from './admin/admin.module';
     PhotosModule,
 
     AdminModule,
+
+    OwnerModule,
   ],
 
   controllers: [],

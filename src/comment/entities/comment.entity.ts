@@ -1,16 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
-@Entity('comment')
-export class Comment {
+
+@Table({tableName: 'comment', timestamps: false})
+export class Comment extends Model<Comment> {
   @ApiProperty({ example: '1', description: 'Unikal id' })
-  @PrimaryGeneratedColumn()
-  id: number;
+  @Column({
+    type: DataType.INTEGER,
+    unique: true,
+    autoIncrement: true,
+    primaryKey: true
+})
+id: number
 
   @ApiProperty({ example: '1', description: 'Unikal id' })
   @Column({
-    nullable: false,
-  })
+    type: DataType.INTEGER,
+    allowNull: false
+})
   guest_id: number;
 
   @ApiProperty({
@@ -18,8 +25,9 @@ export class Comment {
     description: 'Mexmonxona haqida fikrlar',
   })
   @Column({
-    nullable: false,
-  })
+    type: DataType.STRING,
+    allowNull: false
+})
   comment: string;
 
   @ApiProperty({
@@ -27,7 +35,8 @@ export class Comment {
     description: "Mexmonxona reytingi 1dan 10 ga bo'lgan baholash tizimida",
   })
   @Column({
-    nullable: false,
-  })
+    type: DataType.INTEGER,
+    allowNull: false
+})
   reyting: number;
 }

@@ -1,45 +1,61 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
-@Entity('guest')
-export class Guest {
+@Table({ tableName: 'guest', timestamps: false })
+export class Guest extends Model<Guest> {
   @ApiProperty({ example: '1', description: 'Unikal id' })
-  @PrimaryGeneratedColumn()
+  @Column({
+    type: DataType.INTEGER,
+    unique: true,
+    autoIncrement: true,
+    primaryKey: true,
+  })
   id: number;
 
   @ApiProperty({ example: 'Fayziyev', description: 'Guestning familiyasi' })
   @Column({
-    nullable: false,
+    type: DataType.STRING,
+    allowNull: false,
   })
   first_name: string;
 
   @ApiProperty({ example: 'Akmal', description: 'Guestning ismi' })
   @Column({
-    nullable: false,
+    type: DataType.STRING,
+    allowNull: false,
   })
   last_name: string;
 
   @ApiProperty({ example: 'Fayziyev', description: 'Guestning familiyasi' })
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
   })
   phone_number: string;
 
   @ApiProperty({ example: 'Fayziyev', description: 'Guestning familiyasi' })
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
   })
   password: string;
 
   @ApiProperty({ example: 'Fayziyev', description: 'Guestning familiyasi' })
   @Column({
-    unique: true,
+    type: DataType.STRING,
+    allowNull: false,
   })
   email: string;
 
-  @ApiProperty({ example: '1', description: 'Guestning jinsi 1 yoki 2' })
+
+  @ApiProperty({ example: 'true', description: 'Ownerligi' })
   @Column({
-    unique: true,
+    type: DataType.BOOLEAN,
   })
-  gender: number;
+  is_owner: boolean;
 
-
+  @Column({
+    type: DataType.STRING
+  })
+  refresh_token: string
 }

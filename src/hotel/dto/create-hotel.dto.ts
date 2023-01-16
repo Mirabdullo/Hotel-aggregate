@@ -22,10 +22,6 @@ export class CreateHotelDto {
     @IsString({message: "service must be string"})
     description: string
 
-    @ApiProperty({example: "1", description: "Photos id"})
-    @IsNumber({},{message: "id must be string"})
-    photo_id: number
-
     @ApiProperty({example: "1", description: "Comment id"})
     @IsNumber({},{message: "id must be string"})
     comment_id: number
