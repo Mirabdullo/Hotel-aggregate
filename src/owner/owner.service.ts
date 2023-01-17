@@ -34,20 +34,20 @@ export class OwnerService {
       }
 
       const hashedPAssword = await bcrypt.hash(createOwnerDto.password, 7);
-      const guest = await this.ownerRepository.create({
+      const owner = await this.ownerRepository.create({
         ...createOwnerDto,
         password: hashedPAssword,
       });
 
-      const token = await this.getTokens(guest.id, guest.email);
-      await this.updateRefreshTokenHash(guest.id, token.refresh_token);
+      const token = await this.getTokens(owner.id, owner.email);
+      await this.updateRefreshTokenHash(owner.id, token.refresh_token);
 
       res.cookie('refresh_token', token.refresh_token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
       return {
-        ...guest,
+        ...owner.dataValues,
         access_token: token.access_token,
         refresh_token: token.refresh_token,
       };
@@ -117,10 +117,10 @@ export class OwnerService {
 
   async findOne(id: number) {
     try {
-      const Guest = await this.ownerRepository.findByPk(id, {
+      const owner = await this.ownerRepository.findByPk(id, {
         include: { all: true },
       });
-      return Guest;
+      return owner;
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');
@@ -129,10 +129,10 @@ export class OwnerService {
 
   async update(id: number, updateOwnerDto: UpdateOwnerDto) {
     try {
-      const Guest = await this.ownerRepository.findByPk(id, {
+      const owner = await this.ownerRepository.findByPk(id, {
         include: { all: true },
       });
-      if (!Guest)
+      if (!owner)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
       return await this.ownerRepository.update(updateOwnerDto, {
         where: { id },
@@ -146,15 +146,15 @@ export class OwnerService {
 
   async remove(id: number) {
     try {
-      const Guest = await this.ownerRepository.findByPk(id, {
+      const owner = await this.ownerRepository.findByPk(id, {
         include: { all: true },
       });
-      if (!Guest)
+      if (!owner)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
       await this.ownerRepository.destroy({ where: { id } });
       return {
         messaga: "Ma'lumot o'chirildi",
-        ...Guest,
+        ...owner,
       };
     } catch (error) {
       console.log(error);

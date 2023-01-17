@@ -35,6 +35,4 @@ export class CreateOwnerDto {
   phone_number: string;
 
 
-
-
 }

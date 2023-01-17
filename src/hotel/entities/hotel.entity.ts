@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Category } from "../../category/entities/category.entity";
 import { Comment } from "../../comment/entities/comment.entity";
+import { Owner } from "../../owner/entities/owner.entity";
 import { Photo } from "../../photos/entities/photo.entity";
 import { Place } from "../../place/entities/place.entity";
 
@@ -66,6 +67,14 @@ export class Hotel extends Model<Hotel> {
         allowNull: false
     })
     category_id: number
+
+    @ApiProperty({example: '1', description: "Unikal id"})
+    @ForeignKey(() => Owner)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false
+    })
+    owner_id: number
 
 
     @BelongsTo(() => Comment)

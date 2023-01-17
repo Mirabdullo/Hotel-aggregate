@@ -33,4 +33,8 @@ export class CreateHotelDto {
     @ApiProperty({example: "1", description: "Category id"})
     @IsNumber({},{message: "id must be string"})
     category_id: number
+
+    @ApiProperty({example: "1", description: "Category id"})
+    @IsNumber({},{message: "id must be string"})
+    owner_id: number
 }

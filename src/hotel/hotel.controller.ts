@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req } from '@nestjs/common';
 import { HotelService } from './hotel.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Hotel } from './entities/hotel.entity';
+import { Request, Response } from 'express';
 
 @ApiTags('Hotel')
 @Controller('hotel')
@@ -34,8 +35,8 @@ export class HotelController {
   @ApiOperation({summary: 'Mehmonxona malumotlarini ozgartirish'})
   @ApiResponse({status: 201, type: Hotel})
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHotelDto: UpdateHotelDto) {
-    return this.hotelService.update(+id, updateHotelDto);
+  update(@Param('id') id: string, @Body() updateHotelDto: UpdateHotelDto, @Req() req: Request) {
+    return this.hotelService.update(+id, updateHotelDto, req);
   }
 
   @ApiOperation({summary: 'Mehmonxonani ochirish'})

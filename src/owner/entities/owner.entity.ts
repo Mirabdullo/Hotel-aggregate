@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { Hotel } from "../../hotel/entities/hotel.entity";
 
-@Table({tableName: 'customer', timestamps: false})
+@Table({tableName: 'owner', timestamps: false})
 export class Owner extends Model<Owner> {
     @ApiProperty({example: '1', description: "Unikal ID"})
     @Column({
