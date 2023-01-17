@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator";
-import { IsNull } from "typeorm";
 
 export class CreatePhotoDto {
     @ApiProperty({example: 'Photo', description: "Table name"})

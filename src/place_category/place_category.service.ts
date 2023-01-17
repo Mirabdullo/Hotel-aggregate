@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreatePlaceCategoryDto } from './dto/create-place_category.dto';
 import { UpdatePlaceCategoryDto } from './dto/update-place_category.dto';
 import { PlaceCategory } from './entities/place_category.entity';
@@ -57,8 +57,10 @@ export class PlaceCategoryService {
       });
       if (!PlaceCategory)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      return await this.placeCategoryRepository.update(updatePlaceCategoryDto, {where: { id }, returning: true});
-
+      return await this.placeCategoryRepository.update(updatePlaceCategoryDto, {
+        where: { id },
+        returning: true,
+      });
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');
@@ -73,7 +75,7 @@ export class PlaceCategoryService {
       if (!PlaceCategory)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
       await this.placeCategoryRepository.destroy({
-        where: { id }
+        where: { id },
       });
       return {
         messaga: "Ma'lumot o'chirildi",

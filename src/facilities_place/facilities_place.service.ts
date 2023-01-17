@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreateFacilitiesPlaceDto } from './dto/create-facilities_place.dto';
 import { UpdateFacilitiesPlaceDto } from './dto/update-facilities_place.dto';
 import { FacilitiesPlace } from './entities/facilities_place.entity';
@@ -61,9 +61,15 @@ export class FacilitiesPlaceService {
       );
       if (!FacilitiesPlace)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      return await this.facilitiesPlaceRepository.update(updateFacilitiesPlaceDto, {where: {
-        id,
-      }, returning : true});
+      return await this.facilitiesPlaceRepository.update(
+        updateFacilitiesPlaceDto,
+        {
+          where: {
+            id,
+          },
+          returning: true,
+        },
+      );
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');
@@ -78,7 +84,7 @@ export class FacilitiesPlaceService {
       );
       if (!FacilitiesPlace)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      await this.facilitiesPlaceRepository.destroy({where: { id }});
+      await this.facilitiesPlaceRepository.destroy({ where: { id } });
       return {
         messaga: "Ma'lumot o'chirildi",
         ...FacilitiesPlace,

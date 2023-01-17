@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreateHotelServiceDto } from './dto/create-hotel_service.dto';
 import { UpdateHotelServiceDto } from './dto/update-hotel_service.dto';
 import { HotelService } from './entities/hotel_service.entity';
@@ -57,7 +57,10 @@ export class HotelServiceService {
       });
       if (!HotelService)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      await this.hotelServiceRepository.update(updateHotelServiceDto, {where: { id }, returning: true});
+      await this.hotelServiceRepository.update(updateHotelServiceDto, {
+        where: { id },
+        returning: true,
+      });
       return await this.hotelServiceRepository.findByPk(id, {
         include: { all: true },
       });
@@ -75,7 +78,7 @@ export class HotelServiceService {
       if (!HotelService)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
       await this.hotelServiceRepository.destroy({
-        where: { id }
+        where: { id },
       });
       return {
         messaga: "Ma'lumot o'chirildi",

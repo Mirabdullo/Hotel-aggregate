@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { Place } from './entities/place.entity';
@@ -54,8 +54,10 @@ export class PlaceService {
       });
       if (!Place)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      return await this.placeRepository.update(updatePlaceDto, {where: { id }, returning: true});
-
+      return await this.placeRepository.update(updatePlaceDto, {
+        where: { id },
+        returning: true,
+      });
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');

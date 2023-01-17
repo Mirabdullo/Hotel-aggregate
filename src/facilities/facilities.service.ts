@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreateFacilityDto } from './dto/create-facility.dto';
 import { UpdateFacilityDto } from './dto/update-facility.dto';
 import { Facility } from './entities/facility.entity';
@@ -28,7 +28,9 @@ export class FacilitiesService {
 
   async findAll() {
     try {
-      const categories = await this.facilityRepository.findAll({include: {all: true}});
+      const categories = await this.facilityRepository.findAll({
+        include: { all: true },
+      });
       return categories;
     } catch (error) {
       console.log(error);
@@ -38,7 +40,9 @@ export class FacilitiesService {
 
   async findOne(id: number) {
     try {
-      const Facility = await this.facilityRepository.findByPk(id, {include: {all: true}});
+      const Facility = await this.facilityRepository.findByPk(id, {
+        include: { all: true },
+      });
       return Facility;
     } catch (error) {
       console.log(error);
@@ -51,7 +55,10 @@ export class FacilitiesService {
       const Facility = await this.facilityRepository.findByPk(id);
       if (!Facility)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      return await this.facilityRepository.update(updateFacilityDto, {where: { id }, returning: true});
+      return await this.facilityRepository.update(updateFacilityDto, {
+        where: { id },
+        returning: true,
+      });
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');
@@ -63,7 +70,7 @@ export class FacilitiesService {
       const facility = await this.facilityRepository.findByPk(id);
       if (!facility)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      await this.facilityRepository.destroy({where: { id }});
+      await this.facilityRepository.destroy({ where: { id } });
       return {
         messaga: "Ma'lumot o'chirildi",
         ...facility,

@@ -20,6 +20,7 @@ export class CreatorAdminGuard implements CanActivate {
                 })
             }
             const admin = this.jwtService.verify(token,{secret: process.env.ACCESS_TOKEN_KEY})
+            console.log(admin);
             if(!admin.is_creator){
                 throw new UnauthorizedException({
                     message: "Sizga ruxsat etilmagan",
@@ -27,6 +28,7 @@ export class CreatorAdminGuard implements CanActivate {
             }
             return true
         } catch (error) {
+            console.log(error);
             throw new HttpException(
                 "Ruxsat etilmagan foydalanuvchi",
                 HttpStatus.FORBIDDEN

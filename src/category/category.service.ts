@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -29,7 +29,9 @@ export class CategoryService {
 
   async findAll() {
     try {
-      const categories = await this.categoryRepository.findAll({include: {all: true}});
+      const categories = await this.categoryRepository.findAll({
+        include: { all: true },
+      });
       return categories;
     } catch (error) {
       console.log(error);
@@ -39,7 +41,9 @@ export class CategoryService {
 
   async findOne(id: number) {
     try {
-      const category = await this.categoryRepository.findByPk(id, {include: {all: true}});
+      const category = await this.categoryRepository.findByPk(id, {
+        include: { all: true },
+      });
       return category;
     } catch (error) {
       console.log(error);
@@ -54,7 +58,7 @@ export class CategoryService {
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
       const newCategory = await this.categoryRepository.update(
         updateCategoryDto,
-        {where: { id }, returning: true},
+        { where: { id }, returning: true },
       );
       return newCategory;
     } catch (error) {
@@ -68,7 +72,7 @@ export class CategoryService {
       const category = await this.categoryRepository.findByPk(id);
       if (!category)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      return await this.categoryRepository.destroy({where: { id }});
+      return await this.categoryRepository.destroy({ where: { id } });
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');

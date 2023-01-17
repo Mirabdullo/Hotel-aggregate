@@ -5,14 +5,14 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { Hotel } from './entities/hotel.entity';
 
 @Injectable()
 export class HotelService {
-  constructor(@InjectModel(Hotel) private hotelRepository: typeof Hotel) {}
+  constructor(@InjectModel(Hotel) private hotelRepository: typeof Hotel,
+  ) {}
   async create(createHotelDto: CreateHotelDto) {
     try {
       console.log('Hotel');
@@ -24,7 +24,7 @@ export class HotelService {
   }
 
   async findAll() {
-    try {
+    try { 
       const categories = await this.hotelRepository.findAll({
         include: { all: true },
       });
@@ -40,6 +40,8 @@ export class HotelService {
       const Hotel = await this.hotelRepository.findByPk(id, {
         include: { all: true },
       });
+      if(!Hotel) throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND)
+
       return Hotel;
     } catch (error) {
       console.log(error);

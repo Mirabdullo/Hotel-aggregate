@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { BelongsToMany, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { Hotel } from "../../hotel/entities/hotel.entity";
+import { Place } from "../../place/entities/place.entity";
 
 @Table({tableName: 'photo', timestamps: false})
 export class Photo extends Model<Photo>{
@@ -28,11 +29,15 @@ export class Photo extends Model<Photo>{
     photo: string
 
     @ApiProperty({example: '1', description: "unikal id"})
+    @ForeignKey(() => Hotel)
+    @ForeignKey(() => Photo)
     @Column({
         type: DataType.STRING,
         allowNull: false
     })
     hotel_or_place_id: string
 
+
+ 
 
 }

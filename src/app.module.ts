@@ -17,6 +17,7 @@ import { PhotosModule } from './photos/photos.module';
 import { AdminModule } from './admin/admin.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { OwnerModule } from './owner/owner.module';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
   imports: [
@@ -65,6 +66,8 @@ import { OwnerModule } from './owner/owner.module';
     AdminModule,
 
     OwnerModule,
+
+    TokensModule,
   ],
 
   controllers: [],

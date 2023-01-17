@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { PlaceCategory } from "../../place_category/entities/place_category.entity";
 
 @Table({tableName: 'place', timestamps: false})
 export class Place extends Model<Place> {
@@ -13,6 +14,7 @@ export class Place extends Model<Place> {
     id: number
 
     @ApiProperty({example: '1', description: "Unikal id"})
+    @ForeignKey(() => PlaceCategory)
     @Column({
         type: DataType.INTEGER,
         allowNull: false

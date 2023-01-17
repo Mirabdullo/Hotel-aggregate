@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { Booking } from './entities/booking.entity';
@@ -27,7 +27,7 @@ export class BookingService {
 
   async findAll() {
     try {
-      const categories = await this.bookingRepository.findAll();
+      const categories = await this.bookingRepository.findAll({include: {all: true}});
       return categories;
     } catch (error) {
       console.log(error);
@@ -37,7 +37,7 @@ export class BookingService {
 
   async findOne(id: number) {
     try {
-      const Booking = await this.bookingRepository.findOne({where: { id }});
+      const Booking = await this.bookingRepository.findByPk(id, {include: {all: true}});
       return Booking;
     } catch (error) {
       console.log(error);
@@ -50,9 +50,11 @@ export class BookingService {
       const Booking = await this.bookingRepository.findByPk(id);
       if (!Booking)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      const newBooking = await this.bookingRepository.update(updateBookingDto, {where: {
-        id,
-      }});
+      const newBooking = await this.bookingRepository.update(updateBookingDto, {
+        where: {
+          id,
+        }, returning: true
+      });
       return newBooking;
     } catch (error) {
       console.log(error);
@@ -65,7 +67,7 @@ export class BookingService {
       const Booking = await this.bookingRepository.findByPk(id);
       if (!Booking)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      return await this.bookingRepository.destroy({where: { id }});
+      return await this.bookingRepository.destroy({ where: { id } });
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');

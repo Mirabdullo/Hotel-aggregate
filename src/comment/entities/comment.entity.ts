@@ -1,23 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { Guest } from '../../guest/entities/guest.entity';
 
-
-@Table({tableName: 'comment', timestamps: false})
+@Table({ tableName: 'comment', timestamps: false })
 export class Comment extends Model<Comment> {
   @ApiProperty({ example: '1', description: 'Unikal id' })
   @Column({
     type: DataType.INTEGER,
     unique: true,
     autoIncrement: true,
-    primaryKey: true
-})
-id: number
+    primaryKey: true,
+  })
+  id: number;
 
   @ApiProperty({ example: '1', description: 'Unikal id' })
+  @ForeignKey(() => Guest)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
-})
+    allowNull: false,
+  })
   guest_id: number;
 
   @ApiProperty({
@@ -26,8 +34,8 @@ id: number
   })
   @Column({
     type: DataType.STRING,
-    allowNull: false
-})
+    allowNull: false,
+  })
   comment: string;
 
   @ApiProperty({
@@ -36,7 +44,10 @@ id: number
   })
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
-})
+    allowNull: false,
+  })
   reyting: number;
+
+  @BelongsTo(() => Guest)
+  guest: Guest
 }

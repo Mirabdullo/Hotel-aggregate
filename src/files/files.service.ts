@@ -29,7 +29,7 @@ export class FilesService {
             fs.unlinkSync(path.join(filePath,image))
             return true
         } catch (error) {
-            throw new HttpException("Faynini yangilashda xatolik", HttpStatus.INTERNAL_SERVER_ERROR)
+            throw new HttpException("Faylni yangilashda xatolik", HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 

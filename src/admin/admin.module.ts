@@ -4,16 +4,13 @@ import { AdminController } from './admin.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Admin } from './entities/admin.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { TokensModule } from '../tokens/tokens.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Admin]),
-    JwtModule.register({
-      secret: process.env.PRIVATE_KEY || 'SECRET',
-      signOptions: {
-        expiresIn: '1d',
-      },
-    }),
+    JwtModule,
+    TokensModule
   ],
   controllers: [AdminController],
   providers: [AdminService],

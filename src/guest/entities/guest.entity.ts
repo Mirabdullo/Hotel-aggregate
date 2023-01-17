@@ -48,12 +48,6 @@ export class Guest extends Model<Guest> {
   email: string;
 
 
-  @ApiProperty({ example: 'true', description: 'Ownerligi' })
-  @Column({
-    type: DataType.BOOLEAN,
-  })
-  is_owner: boolean;
-
   @Column({
     type: DataType.STRING
   })

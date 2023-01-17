@@ -5,18 +5,22 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { CreateGuestDto } from './dto/create-guest.dto';
 import { UpdateGuestDto } from './dto/update-guest.dto';
 import { Guest } from './entities/guest.entity';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { LoginDto } from './dto/login-auth.dto';
+import { TokensService } from '../tokens/tokens.service';
 
 @Injectable()
 export class GuestService {
-  constructor(@InjectModel(Guest) private guestRepository: typeof Guest,
-  private readonly jwtService: JwtService) {}
+  constructor(
+    @InjectModel(Guest) private guestRepository: typeof Guest,
+    private readonly tokensService: TokensService,
+  ) {}
   async create(createGuestDto: CreateGuestDto, res: Response) {
     try {
       const candidate = await this.guestRepository.findOne({
@@ -28,32 +32,71 @@ export class GuestService {
           HttpStatus.BAD_REQUEST,
         );
       }
-  
+
       const hashedPAssword = await bcrypt.hash(createGuestDto.password, 7);
       const guest = await this.guestRepository.create({
         ...createGuestDto,
         password: hashedPAssword,
       });
-  
-      const token = await this.getTokens(guest.id, guest.email);
-      await this.updateRefreshTokenHash(guest.id, token.refresh_token)
-      
-      res.cookie('refresh_token', token.refresh_token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
-      return {
-        id: guest.id,
-        message: "guest created!",
-        access_token: token.access_token,
-        refresh_token: token.refresh_token
-      }
 
+      const token = await this.tokensService.getTokens(guest.id, guest.email);
+      await this.tokensService.updateRefreshTokenHash(guest.id, token.refresh_token, res);
+
+      await this.tokensService.writeCookie(token.refresh_token, res)
+      return {
+        ...guest,
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+      };
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');
     }
   }
+
+
+    /////////////////////<<<<<<<<<<<SIGNIN>>>>>>>>>>>>>//////////////////
+    async signin(loginDto: LoginDto, res: Response) {
+      const {email, password} = loginDto
+      const owner = await this.guestRepository.findOne({
+          where: {email}
+      })
+  
+      if(!owner){
+          throw new ForbiddenException("Ro'yxatdan o'ting")
+      }
+  
+      const passwordMatches = await bcrypt.compare(password, owner.password)
+      if(!passwordMatches) throw new ForbiddenException("Email yoki parol noto'g'ri")
+  
+      const tokens = await this.tokensService.getTokens(owner.id, owner.email)
+      await this.tokensService.updateRefreshTokenHash(owner.id, tokens.refresh_token, this.guestRepository)
+  
+      await this.tokensService.writeCookie(tokens.refresh_token, res)
+      return {
+        ...owner,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token
+      }
+    }
+  
+    async logout(id: number) {
+      try {
+        const customer = await this.guestRepository.findByPk(id)
+        if(!customer){
+          throw new HttpException('Malumot topilmadi', HttpStatus.NOT_FOUND)
+        }
+        const user = await this.guestRepository.update({
+          refresh_token: null
+        },{ where: {id:+id}})
+        if(!user) throw new ForbiddenException('Access denide')
+        return true
+      } catch (error) {
+        console.log(error);
+        throw new ForbiddenException('Serverda xatolik')
+      }
+    }
+
 
   async findAll() {
     try {
@@ -103,7 +146,7 @@ export class GuestService {
       });
       if (!Guest)
         throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
-      await this.guestRepository.destroy({where: {id}});
+      await this.guestRepository.destroy({ where: { id } });
       return {
         messaga: "Ma'lumot o'chirildi",
         ...Guest,
@@ -115,38 +158,4 @@ export class GuestService {
   }
 
 
-
-
-
-  async getTokens(id: number, email: string) {
-    const jwtPayload = {
-      sub: id,
-      email: email,
-    };
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(jwtPayload, {
-        secret: process.env.ACCESS_TOKEN_KEY,
-        expiresIn: process.env.ACCESS_TOKEN_TIME,
-      }),
-      this.jwtService.signAsync(jwtPayload, {
-        secret: process.env.REFRESH_TOKEN_KEY,
-        expiresIn: process.env.REFRESH_TOKEN_TIME,
-      }),
-    ]);
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
-  }
-
-
-  async updateRefreshTokenHash(
-    id: number,
-    refreshToken: string,
-  ): Promise<void> {
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 7)
-    await this.guestRepository.update({
-      refresh_token: hashedRefreshToken
-    }, {where: {id},returning: true})
-  }
 }

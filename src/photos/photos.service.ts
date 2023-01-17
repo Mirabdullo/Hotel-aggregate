@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Repository } from 'typeorm';
+
 import { FilesService } from '../files/files.service';
 import { Hotel } from '../hotel/entities/hotel.entity';
 import { HotelService } from '../hotel/hotel.service';
@@ -21,11 +21,11 @@ export class PhotosService {
     @InjectModel(Photo) private photoRepository: typeof Photo,
     private readonly hotelService: HotelService,
     private readonly placeService: PlaceService,
-    private readonly fileService: FilesService
+    private readonly fileService: FilesService,
   ) {}
   async create(createPhotoDto: CreatePhotoDto, photo: any) {
     try {
-      const id = Number(createPhotoDto.hotel_or_place_id)
+      const id = Number(createPhotoDto.hotel_or_place_id);
       if (
         !(
           createPhotoDto.table_name == 'Place' ||
@@ -60,7 +60,7 @@ export class PhotosService {
         ...createPhotoDto,
         photo: fileName,
       });
-      return photos
+      return photos;
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');
@@ -127,21 +127,22 @@ export class PhotosService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      if(photo){
-        await this.fileService.removeFile(Photo.photo)
+      if (photo) {
+        await this.fileService.removeFile(Photo.photo);
         const fileName = await this.fileService.createFile(photo);
-        
-        return this.photoRepository.update({
-          ...updatePhotoDto,
-          photo: fileName
-        },{where: {id}, returning: true})
-  
+
+        return this.photoRepository.update(
+          {
+            ...updatePhotoDto,
+            photo: fileName,
+          },
+          { where: { id }, returning: true },
+        );
       }
       return this.photoRepository.update(updatePhotoDto, {
         where: { id },
         returning: true,
       });
-
     } catch (error) {
       console.log(error);
       throw new ForbiddenException('Serverda xatolik');

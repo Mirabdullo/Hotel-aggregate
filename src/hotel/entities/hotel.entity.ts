@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Category } from "../../category/entities/category.entity";
 import { Comment } from "../../comment/entities/comment.entity";
 import { Photo } from "../../photos/entities/photo.entity";
@@ -66,6 +66,7 @@ export class Hotel extends Model<Hotel> {
         allowNull: false
     })
     category_id: number
+
 
     @BelongsTo(() => Comment)
     comments: Comment

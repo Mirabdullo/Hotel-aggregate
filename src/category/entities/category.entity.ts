@@ -15,7 +15,8 @@ export class Category extends Model<Category>{
     @ApiProperty({example: 'besh yulduz', description: "Mehmonxona categoriyasi"})
     @Column({
         type: DataType.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     })
     category: string
 

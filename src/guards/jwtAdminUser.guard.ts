@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
 
 @Injectable()
-export class AdminOrCustomer implements CanActivate {
+export class AdminOrUser implements CanActivate {
     constructor(private readonly jwtService: JwtService) {}
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         try {

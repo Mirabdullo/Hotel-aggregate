@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { Guest } from '../../guest/entities/guest.entity';
+import { Place } from '../../place/entities/place.entity';
 
 @Table({ tableName: 'booking', timestamps: false })
 export class Booking extends Model<Booking> {
@@ -39,6 +41,7 @@ export class Booking extends Model<Booking> {
   children_count: number;
 
   @ApiProperty({ example: '1', description: 'Place id' })
+  @ForeignKey(() => Place)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -46,6 +49,7 @@ export class Booking extends Model<Booking> {
   place_id: number;
 
   @ApiProperty({ example: '2', description: 'Guest id' })
+  @ForeignKey(() => Guest)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -64,5 +68,11 @@ export class Booking extends Model<Booking> {
     allowNull: false,
   })
   over_all: number;
+
+  @BelongsTo(() => Place)
+  place: Place
+
+  @BelongsTo(() => Guest)
+  guest: Guest
 
 }

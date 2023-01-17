@@ -21,13 +21,9 @@ export class CreateGuestDto {
     @IsString({message: "password must be string"})
     password: string;
 
-    @ApiProperty({example: 'Fayziyev', description: 'Mexmonning  ismi'})
+    @ApiProperty({example: 'akmal@gmail.com', description: 'Mexmonning  emaili'})
     @IsEmail({},{message: "Email to'g'ri kelmadi"})
     email: string;
 
-    @ApiProperty({example: 'Fayziyev', description: 'Mexmonning  ismi'})
-    @IsOptional()
-    @IsBoolean({message: "Owner true yoki false"})
-    is_owner: boolean;
   
 }

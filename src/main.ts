@@ -2,12 +2,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser'
 
 
 async function start() {
   const PORT = process.env.PORT || 3333
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe())
+  app.use(cookieParser())
 
   const swagger = new DocumentBuilder()
   .setTitle('Hotel')
@@ -21,7 +23,7 @@ async function start() {
 
 
   await app.listen(PORT, () => {
-    console.log(`Server is running.... ${PORT}`);
+    console.log(`Server is running.... http://localhost:${PORT}/api/docs`);
   });
 }
 start();

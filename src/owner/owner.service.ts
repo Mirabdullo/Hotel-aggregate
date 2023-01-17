@@ -1,26 +1,198 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/sequelize';
 import { CreateOwnerDto } from './dto/create-owner.dto';
 import { UpdateOwnerDto } from './dto/update-owner.dto';
+import { Owner } from './entities/owner.entity';
+import * as bcrypt from 'bcryptjs'
+import { Response } from 'express';
+import { LoginDto } from './dto/login-auth.dto';
 
 @Injectable()
 export class OwnerService {
-  create(createOwnerDto: CreateOwnerDto) {
-    return 'This action adds a new owner';
+  constructor(
+    @InjectModel(Owner) private ownerRepository: typeof Owner,
+    private readonly jwtService: JwtService,
+  ) {}
+  /////////////////////<<<<<<<<<<<SIGNUP>>>>>>>>>>>>>//////////////////
+
+  async create(createOwnerDto: CreateOwnerDto, res: Response) {
+    try {
+      const candidate = await this.ownerRepository.findOne({
+        where: { email: createOwnerDto.email },
+      });
+      if (candidate) {
+        throw new HttpException(
+          'Bunday fordalanuvchi allaqachon mavjud',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const hashedPAssword = await bcrypt.hash(createOwnerDto.password, 7);
+      const guest = await this.ownerRepository.create({
+        ...createOwnerDto,
+        password: hashedPAssword,
+      });
+
+      const token = await this.getTokens(guest.id, guest.email);
+      await this.updateRefreshTokenHash(guest.id, token.refresh_token);
+
+      res.cookie('refresh_token', token.refresh_token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+      return {
+        ...guest,
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new ForbiddenException('Serverda xatolik');
+    }
   }
 
-  findAll() {
-    return `This action returns all owner`;
+
+  /////////////////////<<<<<<<<<<<SIGNIN>>>>>>>>>>>>>//////////////////
+  async signin(loginDto: LoginDto, res: Response) {
+    const {email, password} = loginDto
+    const owner = await this.ownerRepository.findOne({
+        where: {email}
+    })
+
+    if(!owner){
+        throw new ForbiddenException("Ro'yxatdan o'ting")
+    }
+
+    const passwordMatches = await bcrypt.compare(password, owner.password)
+    if(!passwordMatches) throw new ForbiddenException("Email yoki parol noto'g'ri")
+
+    const tokens = await this.getTokens(owner.id, owner.email)
+    await this.updateRefreshTokenHash(owner.id, tokens.refresh_token)
+
+    res.cookie("refresh_token", tokens.refresh_token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true
+    })
+    return {
+      ...owner,
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} owner`;
+  async logout(id: number) {
+    try {
+      const customer = await this.ownerRepository.findByPk(id)
+      if(!customer){
+        throw new HttpException('Malumot topilmadi', HttpStatus.NOT_FOUND)
+      }
+      const user = await this.ownerRepository.update({
+        refresh_token: null
+      },{ where: {id:+id}})
+      if(!user) throw new ForbiddenException('Access denide')
+      return true
+    } catch (error) {
+      console.log(error);
+      throw new ForbiddenException('Serverda xatolik')
+    }
   }
 
-  update(id: number, updateOwnerDto: UpdateOwnerDto) {
-    return `This action updates a #${id} owner`;
+  async findAll() {
+    try {
+      const categories = await this.ownerRepository.findAll({
+        include: { all: true },
+      });
+      return categories;
+    } catch (error) {
+      console.log(error);
+      throw new ForbiddenException('Serverda xatolik');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} owner`;
+  async findOne(id: number) {
+    try {
+      const Guest = await this.ownerRepository.findByPk(id, {
+        include: { all: true },
+      });
+      return Guest;
+    } catch (error) {
+      console.log(error);
+      throw new ForbiddenException('Serverda xatolik');
+    }
+  }
+
+  async update(id: number, updateOwnerDto: UpdateOwnerDto) {
+    try {
+      const Guest = await this.ownerRepository.findByPk(id, {
+        include: { all: true },
+      });
+      if (!Guest)
+        throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
+      return await this.ownerRepository.update(updateOwnerDto, {
+        where: { id },
+        returning: true,
+      });
+    } catch (error) {
+      console.log(error);
+      throw new ForbiddenException('Serverda xatolik');
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      const Guest = await this.ownerRepository.findByPk(id, {
+        include: { all: true },
+      });
+      if (!Guest)
+        throw new HttpException("Ma'lumot topilmadi", HttpStatus.NOT_FOUND);
+      await this.ownerRepository.destroy({ where: { id } });
+      return {
+        messaga: "Ma'lumot o'chirildi",
+        ...Guest,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new ForbiddenException('Serverda xatolik');
+    }
+  }
+
+  async getTokens(id: number, email: string) {
+    const jwtPayload = {
+      sub: id,
+      email: email,
+    };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(jwtPayload, {
+        secret: process.env.ACCESS_TOKEN_KEY,
+        expiresIn: process.env.ACCESS_TOKEN_TIME,
+      }),
+      this.jwtService.signAsync(jwtPayload, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
+      }),
+    ]);
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  async updateRefreshTokenHash(
+    id: number,
+    refreshToken: string,
+  ): Promise<void> {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 7);
+    await this.ownerRepository.update(
+      {
+        refresh_token: hashedRefreshToken,
+      },
+      { where: { id }, returning: true },
+    );
   }
 }
