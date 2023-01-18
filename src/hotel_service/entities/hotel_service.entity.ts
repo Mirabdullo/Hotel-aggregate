@@ -32,14 +32,6 @@ export class HotelService extends Model<HotelService> {
     service_id: number
 
 
-    @ApiProperty({example: '1', description: 'Unikal id'})
-    @ForeignKey(() => Owner)
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false
-    })
-    owner_id: number
-
     @BelongsTo(() => Hotel)
     hotel: Hotel
 

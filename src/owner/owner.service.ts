@@ -27,7 +27,7 @@ export class OwnerService {
         where: { email: createOwnerDto.email },
       });
       if (candidate) {
-        throw new HttpException(
+        return new HttpException(
           'Bunday fordalanuvchi allaqachon mavjud',
           HttpStatus.BAD_REQUEST,
         );

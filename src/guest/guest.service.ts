@@ -27,7 +27,7 @@ export class GuestService {
         where: { email: createGuestDto.email },
       });
       if (candidate) {
-        throw new HttpException(
+        return new HttpException(
           'Bunday fordalanuvchi allaqachon mavjud',
           HttpStatus.BAD_REQUEST,
         );
@@ -40,11 +40,11 @@ export class GuestService {
       });
 
       const token = await this.tokensService.getTokens(guest.id, guest.email);
-      await this.tokensService.updateRefreshTokenHash(guest.id, token.refresh_token, res);
+      await this.tokensService.updateRefreshTokenHash(guest.id, token.refresh_token, this.guestRepository);
 
       await this.tokensService.writeCookie(token.refresh_token, res)
       return {
-        ...guest,
+        ...guest.dataValues,
         access_token: token.access_token,
         refresh_token: token.refresh_token,
       };
