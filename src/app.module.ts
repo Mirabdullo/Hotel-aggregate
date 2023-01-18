@@ -18,6 +18,20 @@ import { AdminModule } from './admin/admin.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { OwnerModule } from './owner/owner.module';
 import { TokensModule } from './tokens/tokens.module';
+import { Admin } from './admin/entities/admin.entity';
+import { Booking } from './booking/entities/booking.entity';
+import { Category } from './category/entities/category.entity';
+import { Comment } from './comment/entities/comment.entity';
+import { Facility } from './facilities/entities/facility.entity';
+import { FacilitiesPlace } from './facilities_place/entities/facilities_place.entity';
+import { Guest } from './guest/entities/guest.entity';
+import { Hotel } from './hotel/entities/hotel.entity';
+import { HotelService } from './hotel_service/entities/hotel_service.entity';
+import { Owner } from './owner/entities/owner.entity';
+import { Photo } from './photos/entities/photo.entity';
+import { Place } from './place/entities/place.entity';
+import { PlaceCategory } from './place_category/entities/place_category.entity';
+import { Service } from './service/entities/service.entity';
 
 @Module({
   imports: [
@@ -34,7 +48,7 @@ import { TokensModule } from './tokens/tokens.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [],
+      models: [Admin, Booking, Category, Comment, Facility, FacilitiesPlace, Guest, Hotel, HotelService, Owner, Photo, Place, PlaceCategory, Service],
       autoLoadModels: true,
       logging: false,
     }),

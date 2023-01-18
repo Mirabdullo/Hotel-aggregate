@@ -6,7 +6,7 @@ import * as cookieParser from 'cookie-parser'
 
 
 async function start() {
-  const PORT = process.env.PORT || 3333
+  const PORT = process.env.PORT
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe())
   app.use(cookieParser())
